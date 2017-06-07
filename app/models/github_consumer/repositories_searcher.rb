@@ -6,25 +6,27 @@ module GithubConsumer
 
     PARAMS_COMBINATIONS = [
       {sort: nil, order: nil}, # best match
-      {sort: "stars", order: "desc"},
-      {sort: "forks", order: "desc"},
-      {sort: "stars", order: "asc", reversed: true},
-      {sort: "forks", order: "asc", reversed: true}
+      {sort: "comments", order: "desc"},
+      {sort: "created", order: "desc"},
+      {sort: "comments", order: "asc", reversed: true},
+      {sort: "created", order: "asc", reversed: true}
     ]
 
-    def get_all_repositories_urls(query)
-      repos_url = "https://api.github.com/search/repositories?q=#{query.gsub(" ","+")}+in:readme&per_page=100"
+    def get_all_issues_urls(query)
+      issues_url = "https://api.github.com/search/issues?q=#{query.gsub(" ","+")}+is:issue&per_page=100"
       all_head_urls = []
       client = Client.new
       items = []
       PARAMS_COMBINATIONS.each_with_index do |params, i|
-        url = UrlBuilder.build(repos_url, 1, params[:sort], params[:order])
+        url = UrlBuilder.build(issues_url, 1, params[:sort], params[:order])
         client.register_request url do |first_page_json|
-          items = get_remaning_pages(repos_url, first_page_json, params)
+          items = get_remaning_pages(issues_url, first_page_json, params)
 
           # une as urls
           all_head_urls[i] = head_urls_from(items, params[:reversed])
         end
+        puts "\n\n\n\n\n\n\nteste\n\n\n\n\n\n\n"
+        exit
       end
       client.run_requests
       all_head_urls.reduce(:|)
@@ -40,7 +42,7 @@ module GithubConsumer
       is_reversed ? head_urls.reverse : head_urls
     end
 
-    def get_remaning_pages(repos_url, first_page_json, params)
+    def get_remaning_pages(issues_url, first_page_json, params)
       total_items = first_page_json["total_count"]
       total_pages = [total_items / 100, MAX_PAGES].min
 
@@ -48,7 +50,7 @@ module GithubConsumer
       items[1] = first_page_json["items"]
       client = Client.new
       (2..total_pages).each do |page|
-        page_url = UrlBuilder.build(repos_url, page, params[:sort], params[:order])
+        page_url = UrlBuilder.build(issues_url, page, params[:sort], params[:order])
         client.register_request page_url do |json|
           items[page] = json["items"]
         end
