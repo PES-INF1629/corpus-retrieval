@@ -9,7 +9,17 @@
 
 <%= form_tag search_readmes_path do |f| %>
 	<input name="q"></input>
+    <select name="label">
+        <option value="bug">bug</option>
+        <option value="duplicate">duplicate</option>
+        <option value="enhancement">enhancement</option>
+        <option value="help wanted">help wanted</option>
+        <option value="invalid">invalid</option>
+        <option value="">sem labels</option>
+    </select>
 	<input type="submit" value="Buscar"></input>
+    <br>
+    <input type="checkbox" name="comentarios">Pegar comentarios
 <% end %>
 
 <div id="readmes-sets-container">

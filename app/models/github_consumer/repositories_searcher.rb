@@ -2,7 +2,7 @@ module GithubConsumer
   module RepositoriesSearcher
     extend self
 
-    MAX_PAGES = 10
+    MAX_PAGES = 1
 
     PARAMS_COMBINATIONS = [
       {sort: nil, order: nil}, # best match

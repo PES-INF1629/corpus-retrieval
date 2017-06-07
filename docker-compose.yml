@@ -11,9 +11,9 @@ web:
   environment:
     - REDIS_URL=redis://redis.local/0
     - MONGODB_HOST=mongo.local
-    - CLIENT_ID=grupomining
-    - CLIENT_SECRET=grupomining
-    - SLAVES=githubproxy1.com,githubproxy2.com,githubproxy3.com
+    - CLIENT_ID=af4fd26055849b605cf3
+    - CLIENT_SECRET=b92d20f8b1d529bc111c7f82af9203410f6656f2
+    - SLAVES=
 
 sidekiq:
   command: bundle exec sidekiq
@@ -26,9 +26,9 @@ sidekiq:
   environment:
     - REDIS_URL=redis://redis.local/0
     - MONGODB_HOST=mongo.local
-    - CLIENT_ID=grupomining
-    - CLIENT_SECRET=grupomining
-    - SLAVES=githubproxy1.com,githubproxy2.com,githubproxy3.com
+    - CLIENT_ID=af4fd26055849b605cf3
+    - CLIENT_SECRET=b92d20f8b1d529bc111c7f82af9203410f6656f2
+    - SLAVES=
 
 redis:
   image: redis:3.2
