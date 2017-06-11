@@ -33,6 +33,7 @@ module GithubConsumer
       client.run_requests
       all_head_urls.reduce(:|)
       
+      ### Visual test...
       #puts "\nPrimeira    issue:\n"
       #puts all_head_urls[0]
       #puts "\nIssue     acabou\n"

@@ -58,9 +58,10 @@ module GithubConsumer
       end
       # client.run_requests
 
-      puts "\n    First issue content:    \n"
-      puts issues_content[0]
-      puts "\n    Content finished    \n"
+      ### Visual test...
+      # puts "\n    First issue content:    \n"
+      # puts issues_content[0]
+      # puts "\n    Content finished    \n"
 
       issues_content
     end
