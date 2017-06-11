@@ -1,9 +1,12 @@
 module GithubConsumer
   class Client
+
+    # The class constructor
     def initialize
       @hydra = Typhoeus::Hydra.new(max_concurrency: 14)
     end
 
+    # Builds a request, puts it inside a queue and returns it
     def register_request(url, &block)
       request = Typhoeus::Request.new url
       request.on_complete do |response|
@@ -23,6 +26,7 @@ module GithubConsumer
       request
     end
 
+    # Executes the queue of requests
     def run_requests
       @hydra.run
     end
