@@ -8,7 +8,18 @@
 </hgroup>
 
 <%= form_tag search_readmes_path do |f| %>
-	<input name="q"></input>
+	<input name="q">
+	<input value="Buscar" type="submit">
+  <br>
+    <select name="match">
+        <option value="best match">best match</option>
+        <option value="most stars">most stars</option>
+        <option value="fewest stars">fewest stars</option>
+        <option value="most forks">most forks</option>
+        <option value="fewest fork">fewest fork</option>
+        <option value="recently updated">recently updated</option>
+        <option value="least recently updated">least recently updated</option>
+  </select>
     <select name="label">
         <option value="bug">bug</option>
         <option value="duplicate">duplicate</option>
@@ -16,10 +27,8 @@
         <option value="help wanted">help wanted</option>
         <option value="invalid">invalid</option>
         <option value="">sem labels</option>
-    </select>
-	<input type="submit" value="Buscar"></input>
-    <br>
-    <input type="checkbox" name="comentarios">Pegar comentarios
+  </select>
+  <input name="comentarios" type="checkbox">Pegar comentarios
 <% end %>
 
 <div id="readmes-sets-container">
