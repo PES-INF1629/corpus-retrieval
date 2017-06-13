@@ -3,6 +3,9 @@ module GithubConsumer
     extend self
 
     # Builds structure representing info inside each file in corpus and returns it (doesn't build file nor corpus, only info)
+    #######
+    # TODO: Treat requisition for comments (see ideas below)
+    #######
     def get_info_from_issues(issues_urls)
       unrecognizeds = [] # Needed?
       client = Client.new
@@ -69,7 +72,7 @@ module GithubConsumer
   private
 
     # Returns the name to file containing info of given issue
-    # Logic: 'position in request'.-.'repository owner'.-.'repository name'.-.'issue id in GitHub'.txt
+    # Logic: 'position in request'.-.'repository owner'.-.'repository name'.-.'issue id in GitHub'.json
     def file_name_from(i, issue_data)
       data = [
         sprintf("%.4d", i+1),
@@ -77,7 +80,7 @@ module GithubConsumer
         issue_data[:url].split("/")[5],
         issue_data[:id]
       ]
-      "#{data.join(".-.")}.txt"
+      "#{data.join(".-.")}.json"
     end
   end
 end
