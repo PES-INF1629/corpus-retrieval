@@ -12,7 +12,12 @@ class ReadmesController < ApplicationController
   def search_form; end
 
   def search
-    ReadmesSetCreatorWorker.perform_async(params[:q])
+    comments = false
+    if(params.has_key?("comments"))
+        comments = true
+    end
+    
+    ReadmesSetCreatorWorker.perform_async(params[:query], params[:match], params[:label], comments)
     redirect_to readmes_path
   end
 end
