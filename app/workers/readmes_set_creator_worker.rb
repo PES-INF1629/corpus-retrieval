@@ -2,13 +2,7 @@ class ReadmesSetCreatorWorker
   include Sidekiq::Worker
   sidekiq_options retry: false
 
-  def perform(query, match, label, comments)
-    puts(query)
-    puts(match)
-    puts(label)
-    puts(comments)
-    print("\nHERE\n")
-    sleep(60)
+  def perform(query)
     filename = query.gsub(/ +/, "_") + ".zip"
     readmes_set = ReadmesSet.create query: query, filename: filename, worker_id: self.jid
     ReadmesSet.destroy_olds!
