@@ -26,5 +26,9 @@ module GithubConsumer
     def run_requests
       @hydra.run
     end
+
+    def requests_amount
+      @hydra.queue.size
+    end
   end
 end
