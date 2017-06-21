@@ -30,5 +30,10 @@ module GithubConsumer
     def run_requests
       @hydra.run
     end
+
+    # Gives size of queue (needed for HTML bar)
+    def requests_amount
+      @hydra.queue.size
+    end
   end
 end
