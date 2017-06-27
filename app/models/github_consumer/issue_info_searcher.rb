@@ -6,7 +6,7 @@ module GithubConsumer
     #######
     # TODO: Treat requisition for comments (see ideas below)
     #######
-    def get_info_from_issues(issues_urls)
+    def get_info_from_issues(issues_urls, comments)
       unrecognizeds = [] # Needed?
       client = Client.new
       issues_data = []

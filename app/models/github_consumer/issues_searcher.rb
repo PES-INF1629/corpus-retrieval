@@ -16,7 +16,7 @@ module GithubConsumer
     #######
     # TODO: Treat "+label:'labelname'" and organization in whichever way client asks (i.e., "most commented", "most recent", etc.)
     #######
-    def get_all_issues_urls(query)
+    def get_all_issues_urls(query, match, label)
       issues_url = "https://api.github.com/search/issues?q=#{query.gsub(" ","+")}+is:issue&per_page=100"
       all_head_urls = []
       client = Client.new

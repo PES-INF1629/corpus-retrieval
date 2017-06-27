@@ -12,21 +12,17 @@
     <input value="Search" type="submit">
     <br>
     <select name="match">
-        <option value="best match">best match</option>
-        <option value="most stars">most commented</option>
-        <option value="fewest stars">least commented</option>
-        <option value="most forks">newest</option>
-        <option value="fewest fork">oldest</option>
-        <option value="recently updated">recently updated</option>
-        <option value="least recently updated">least recently updated</option>
+        <option value="">best match</option>
+        <option value="sort=comments">most commented</option>
+        <option value="sort=created">newest</option>
+        <option value="sort=updated">recently updated</option>
     </select>
     <select name="label">
-        <option value="">without label</option>
-        <option value="bug">bug</option>
-        <option value="duplicate">duplicate</option>
-        <option value="enhancement">enhancement</option>
-        <option value="help wanted">help wanted</option>
-        <option value="invalid">invalid</option>
+        <option value="no:label">without label</option>
+        <option value="label:bug">bug</option>
+        <option value="label:enhancement">enhancement</option>
+        <option value='label:"help wanted"'>help wanted</option>
+        <option value="label:question">question</option>
     </select>
     <input name="comments" type="checkbox">Get comments
 <% end %>
