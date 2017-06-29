@@ -4,9 +4,9 @@ module GithubConsumer
 
     # Builds structure representing info inside each file in corpus and returns it (doesn't build file nor corpus, only info)
     #######
-    # TODO: Treat requisition for comments (see ideas below)
+    # TODO: Make comment part without repeating code
     #######
-    def get_info_from_issues(issues_urls, comments)
+    def get_info_from_issues(issues_urls, comments, match)
       unrecognizeds = [] # Needed?
       client = Client.new
       issues_data = []
@@ -14,57 +14,74 @@ module GithubConsumer
         issue_data = nil
         url = UrlBuilder.build(head_url)
         client.register_request url do |root_json|
-          ### IDEA 1: Build issues info alongside comments info
-          # if 'no_comments'
             issues_data.push(
-              id: root_json["id"], # Just to identify in txt file...
+              id: root_json["id"], # To identify in json file
               url: root_json["url"],
               title: root_json["title"],
+              user: root_json["user"]["login"],
               labels: root_json["labels"],
               body: root_json["body"],
-              comments_url: root_json["comments_url"] # Needed for IDEA 2
+
+              comments: root_json["comments"], # If comments info are needed (match in most commented and/or getting comments content)
+              comments_url: root_json["comments_url"],
+              
+              created_at: root_json["created_at"], # Matching in most recently created
+              updated_at: root_json["updated_at"] # Matching in most recently updated
             )
-          # else
-          #  issues_data.push(
-          #   ...
-          #   comments: root_json["comments"],
-          #   ####
-          # => Line below will probably need another request: 'Client.new' bla bla bla
-          #   ####
-          #   comments_info: 'comment info' from root_json["comments_url"] 
-          #  )
         end
       end
       client.run_requests
 
       issues_content = []
 
-      ### IDEA 2: We use block below to look for comments, taking info from block above and merging
-      ###         with "comments" and "comments_info" into a new structure. See that client class usage
-      ###         for requests is specified below in commented lines.
-      # client = Client.new
-      issues_data.compact.each.with_index do |issue_data, i|
-        # url = UrlBuilder.build issue_data[:comments_url]
-        # client.register_request url do |issue_json|
-          # Gotta see how to store into structure each comment separately (or together)...
-          # comments_content = 'info from "comments_url"'
+      ### Code repeating below, make it better ###
+      # Passin info to new structure AND searching for comments
+      if comments then
+        client = Client.new
+        flag = true
+        issues_data.compact.each.with_index do |issue_data, i|
+          url = UrlBuilder.build issue_data[:comments_url]
+          filename = file_name_from(i, issue_data)
+          comments_content = []
+
+          client.register_request url do |comments_json|
+            
+            for commentIndex in 0..comments_json.length - 1 # Vector of comments content
+              comments_content.push({user: comments_json[commentIndex]["user"]["login"], body: comments_json[commentIndex]["body"]})
+            end
+            
+            issues_content.push(
+              filename: filename,
+              url: issue_data[:url],
+              title: issue_data[:title],
+              user: issue_data[:user],
+              labels: issue_data[:labels],
+              body: issue_data[:body],
+              comments: issue_data[:comments],
+              comments_content: comments_content
+            )
+          end
+
+        end
+        client.run_requests
+      else # Only passing info to new structure
+        issues_data.compact.each.with_index do |issue_data, i|
           filename = file_name_from(i, issue_data)
           issues_content.push(
             filename: filename,
             url: issue_data[:url],
             title: issue_data[:title],
+            user: issue_data[:user],
             labels: issue_data[:labels],
             body: issue_data[:body]
-            #,comments_info: comments_content)
           )
-        # end
+        end
       end
-      # client.run_requests
 
       ### Visual test...
-      # puts "\n    First issue content:    \n"
-      # puts issues_content[0]
-      # puts "\n    Content finished    \n"
+      #puts "\n    Random issue content:    \n"
+      #puts issues_content[10]
+      #puts "\n    Content finished    \n"
 
       issues_content
     end
