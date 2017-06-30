@@ -4,7 +4,9 @@ module GithubConsumer
 
     # Builds structure representing info inside each file in corpus and returns it (doesn't build file nor corpus, only info)
     #######
-    # TODO: Make comment part without repeating code
+    # TODO:
+    # 1 - Order issues_content with match logic
+    # 2 - Eliminate repeated code when populating issues_content
     #######
     def get_info_from_issues(issues_urls, comments, match)
       unrecognizeds = [] # Needed?
@@ -46,16 +48,25 @@ module GithubConsumer
 
           client.register_request url do |comments_json|
             
-            for commentIndex in 0..comments_json.length - 1 # Vector of comments content
-              comments_content.push({user: comments_json[commentIndex]["user"]["login"], body: comments_json[commentIndex]["body"]})
+            if not comments_json.nil? then # Some issues may not have comments
+              for commentIndex in 0..comments_json.length - 1 # comments_json contains a vector with each index being a comment
+                comments_content.push(user: comments_json[commentIndex]["user"]["login"], body: comments_json[commentIndex]["body"])
+              end
             end
             
+            labels = []
+            if not issue_data[:labels].nil? then
+              for labelIndex in 0..issue_data[:labels].length - 1 # Issue may contain more than one label
+                labels.push(name: issue_data[:labels][labelIndex]["name"])
+              end
+            end
+
             issues_content.push(
               filename: filename,
               url: issue_data[:url],
               title: issue_data[:title],
               user: issue_data[:user],
-              labels: issue_data[:labels],
+              labels: labels,
               body: issue_data[:body],
               comments: issue_data[:comments],
               comments_content: comments_content
@@ -67,6 +78,12 @@ module GithubConsumer
       else # Only passing info to new structure
         issues_data.compact.each.with_index do |issue_data, i|
           filename = file_name_from(i, issue_data)
+          labels = []
+          if not issue_data[:labels].nil? then
+            for labelIndex in 0..issue_data[:labels].length - 1 # Issue may contain more than one label
+              labels.push(name: issue_data[:labels][labelIndex]["name"])
+            end
+          end
           issues_content.push(
             filename: filename,
             url: issue_data[:url],
@@ -79,8 +96,15 @@ module GithubConsumer
       end
 
       ### Visual test...
-      #puts "\n    Random issue content:    \n"
-      #puts issues_content[10]
+      #puts "\n    Some issue content:    \n"
+      #for issuesContentIndex in 0..issues_content.length - 1
+      #  if not issues_content[issuesContentIndex][:body].blank? and # Issue has body
+      #      (not comments or issues_content[issuesContentIndex][:comments] == 3) and # Has 3 comments
+      #      (not issues_content[issuesContentIndex][:labels].nil? and issues_content[issuesContentIndex][:labels].length == 2) then # Has two labels
+      #    puts issues_content[issuesContentIndex]
+      #    break
+      #  end
+      #end
       #puts "\n    Content finished    \n"
 
       issues_content
