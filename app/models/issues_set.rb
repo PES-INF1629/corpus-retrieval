@@ -1,4 +1,4 @@
-class ReadmesSet
+class IssuesSet
   include Mongoid::Document
   include Mongoid::Timestamps
 
@@ -14,7 +14,7 @@ class ReadmesSet
   field :status, type: Integer, default: STATUSES.index(:processing)
 
   def self.destroy_olds!
-    ReadmesSet.order(:created_at.desc).offset(MAX_STORED).destroy_all
+    IssuesSet.order(:created_at.desc).offset(MAX_STORED).destroy_all
   end
 
   def self.status_of(status_symbol)
@@ -23,8 +23,8 @@ class ReadmesSet
   end
 
   def finish!(zip)
-    self.update_attributes! zip: zip, status: ReadmesSet.status_of(:finished)
-    ReadmesSet.where(query: self.query, :id.ne => self.id).destroy_all
+    self.update_attributes! zip: zip, status: IssuesSet.status_of(:finished)
+    IssuesSet.where(query: self.query, :id.ne => self.id).destroy_all
   end
 
   def zip_to_download
@@ -36,6 +36,6 @@ class ReadmesSet
   end
 
   def finished?
-    self.status == ReadmesSet.status_of(:finished)
+    self.status == IssuesSet.status_of(:finished)
   end
 end

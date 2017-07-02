@@ -7,6 +7,10 @@
 	<h2>of GitHub issues</h2>
 </hgroup>
 
+<!--
+This "form_tag" is responsabile for getting all information from client.
+After the client submit, everything will be send to "controllers/issues_controller.rb" method "search".
+-->
 <%= form_tag search_issues_path do |f| %>
     <input name="query">
     <input value="Search" type="submit">
@@ -27,6 +31,9 @@
     <input name="comments" type="checkbox">Get comments
 <% end %>
 
+<!--
+This "div" will show every search made on this database.
+-->
 <div id="issues-sets-container">
   <h2>Issues of another queries</h2>
   <ul class="issues-sets">

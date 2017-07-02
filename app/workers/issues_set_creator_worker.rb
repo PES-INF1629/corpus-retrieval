@@ -1,18 +1,16 @@
-class ReadmesSetCreatorWorker
+class IssuesSetCreatorWorker
   include Sidekiq::Worker
   sidekiq_options retry: false
 
+  # Define the name of the zip
   def perform(query, match, label, comments)
-    # TESTS
-    #puts(query)
-    #puts(match)
-    #puts(label)
-    #puts(comments)
-    #print("\nHERE\n")
-    #sleep(60)
     filename = query.gsub(/ +/, "_") + ".zip"
-    issues_set = ReadmesSet.create query: query, filename: filename, worker_id: self.jid
-    ReadmesSet.destroy_olds!
+    puts("\n            Testing Here           \n")
+    puts(filename)
+    puts("\n            Testing Here            \n")
+    sleep(60)
+    issues_set = IssuesSet.create query: query, filename: filename, worker_id: self.jid
+    IssuesSet.destroy_olds!
 
     begin
       issues = GithubConsumer.get_issues query, match, label, comments
@@ -20,7 +18,7 @@ class ReadmesSetCreatorWorker
 
       issues_set.finish! BSON::Binary.new(binary)
     rescue Exception => e
-      issues_set.update_attributes! status: ReadmesSet.status_of(:failed)
+      issues_set.update_attributes! status: IssuesSet.status_of(:failed)
       raise e
     end
   end
