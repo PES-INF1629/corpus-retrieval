@@ -3,12 +3,10 @@ class IssuesSetCreatorWorker
   sidekiq_options retry: false
 
   # Define the name of the zip
+  # Didn't understood IssuesSet
+  # Destroy olds just let the 30 recent files alive
   def perform(query, match, label, comments)
     filename = query.gsub(/ +/, "_") + ".zip"
-    puts("\n            Testing Here           \n")
-    puts(filename)
-    puts("\n            Testing Here            \n")
-    sleep(60)
     issues_set = IssuesSet.create query: query, filename: filename, worker_id: self.jid
     IssuesSet.destroy_olds!
 
