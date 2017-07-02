@@ -6,7 +6,6 @@ module GithubConsumer
     #######
     # TODO:
     # 1 - Order issues_content with match logic
-    # 2 - Eliminate repeated code when populating issues_content
     #######
     def get_info_from_issues(issues_urls, comments, match)
       unrecognizeds = [] # Needed?
@@ -36,64 +35,43 @@ module GithubConsumer
 
       issues_content = []
 
-      ### Code repeating below, make it better ###
-      # Passin info to new structure AND searching for comments
-      if comments then
-        client = Client.new
-        flag = true
-        issues_data.compact.each.with_index do |issue_data, i|
-          url = UrlBuilder.build issue_data[:comments_url]
-          filename = file_name_from(i, issue_data)
-          comments_content = []
+      # For comments retrieving
+      client = Client.new
 
+      issues_data.compact.each.with_index do |issue_data, i|
+        
+        filename = file_name_from(i, issue_data)
+        labels = []
+        if not issue_data[:labels].nil? then
+          for labelIndex in 0..issue_data[:labels].length - 1 # Issue may contain more than one label
+            labels.push(name: issue_data[:labels][labelIndex]["name"])
+          end
+        end
+
+        issues_content.push(
+          filename: filename,
+          url: issue_data[:url],
+          title: issue_data[:title],
+          user: issue_data[:user],
+          labels: labels,
+          body: issue_data[:body]
+        )
+
+        if comments then
+          url = UrlBuilder.build issue_data[:comments_url]
           client.register_request url do |comments_json|
-            
+            comments_content = []
             if not comments_json.nil? then # Some issues may not have comments
               for commentIndex in 0..comments_json.length - 1 # comments_json contains a vector with each index being a comment
                 comments_content.push(user: comments_json[commentIndex]["user"]["login"], body: comments_json[commentIndex]["body"])
               end
             end
-            
-            labels = []
-            if not issue_data[:labels].nil? then
-              for labelIndex in 0..issue_data[:labels].length - 1 # Issue may contain more than one label
-                labels.push(name: issue_data[:labels][labelIndex]["name"])
-              end
-            end
-
-            issues_content.push(
-              filename: filename,
-              url: issue_data[:url],
-              title: issue_data[:title],
-              user: issue_data[:user],
-              labels: labels,
-              body: issue_data[:body],
-              comments: issue_data[:comments],
-              comments_content: comments_content
-            )
+            issues_content[i][:comments] = issue_data[:comments]
+            issues_content[i][:comments_content] = comments_content
           end
-
-        end
-        client.run_requests
-      else # Only passing info to new structure
-        issues_data.compact.each.with_index do |issue_data, i|
-          filename = file_name_from(i, issue_data)
-          labels = []
-          if not issue_data[:labels].nil? then
-            for labelIndex in 0..issue_data[:labels].length - 1 # Issue may contain more than one label
-              labels.push(name: issue_data[:labels][labelIndex]["name"])
-            end
-          end
-          issues_content.push(
-            filename: filename,
-            url: issue_data[:url],
-            title: issue_data[:title],
-            user: issue_data[:user],
-            labels: issue_data[:labels],
-            body: issue_data[:body]
-          )
-        end
+        end   
       end
+      client.run_requests
 
       ### Visual test...
       #puts "\n    Some issue content:    \n"
@@ -102,7 +80,7 @@ module GithubConsumer
       #      (not comments or issues_content[issuesContentIndex][:comments] == 3) and # Has 3 comments
       #      (not issues_content[issuesContentIndex][:labels].nil? and issues_content[issuesContentIndex][:labels].length == 2) then # Has two labels
       #    puts issues_content[issuesContentIndex]
-      #    break
+      #   break
       #  end
       #end
       #puts "\n    Content finished    \n"
