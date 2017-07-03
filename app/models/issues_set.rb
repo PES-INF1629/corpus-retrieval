@@ -38,4 +38,8 @@ class IssuesSet
   def finished?
     self.status == IssuesSet.status_of(:finished)
   end
+  
+  def processing?
+    self.status == IssuesSet.status_of(:processing)
+  end
 end

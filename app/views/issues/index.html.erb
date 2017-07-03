@@ -61,7 +61,7 @@ var reloadTimer = window.setInterval(reloadPage,5000)
 
 function reloadPage () {
     <%- @sets.each do |set| %>
-        <% if !set.finished? %>
+        <% if set.processing? %>
             location = "/"
             <% break %>
         <% end %>
