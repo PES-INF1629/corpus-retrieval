@@ -51,17 +51,20 @@ This "div" will show every search made on this database.
   </ul>
 </div>
 
-<p id="demo"></p>
-
 <!--
 A little script that will refresh page every 5 seconds.
-Not the best way to update the user about the situation, would be better if someone knew one way to make ruby tell this page when the status from query change.
+Thsi is NOT the best way to update the user about the situation, would be better if someone knew one way to make ruby tell this page when the status from query change.
+My guess is that i would need ajax/jquery i don't know. I don't understand this things.
 -->
 <script>
-var reloadTimer = setInterval(reloadPage,5000)
+var reloadTimer = window.setInterval(reloadPage,5000)
 
 function reloadPage () {
-
-    location = "/"
+    <%- @sets.each do |set| %>
+        <% if !set.finished? %>
+            location = "/"
+            <% break %>
+        <% end %>
+    <%- end %>
 }
 </script>

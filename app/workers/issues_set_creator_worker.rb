@@ -19,5 +19,9 @@ class IssuesSetCreatorWorker
       issues_set.update_attributes! status: IssuesSet.status_of(:failed)
       raise e
     end
+    
+    puts("-----------asdf")
+    render("issues/index")
+    puts("-----------asdf")
   end
 end
