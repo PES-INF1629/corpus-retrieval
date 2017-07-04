@@ -38,6 +38,8 @@ module GithubConsumer
       issues_set.set_total_issues_amount!(issues_urls.length)
       client.run_requests
 
+      order_structure(issues_data, match)
+
       issues_content = []
 
       # For comments retrieving
@@ -94,6 +96,74 @@ module GithubConsumer
     end
 
   private
+
+    # Order the initial structure
+    #######
+    # TODO:
+    # 1 - fix order error in most_updated and most_recent
+    #######
+    def order_structure(issues_data, match)
+
+      descending_sort_comment = ->(a,b) { b[:comments] <=> a[:comments] }
+      descending_sort_create = ->(a,b) { 
+        charArrayB = b[:created_at].chars
+        charArrayA = a[:created_at].chars
+        val = 0
+
+        for stringIndex in 0..charArrayB.length - 1
+          if charArrayB[stringIndex] > charArrayA[stringIndex] then
+            val = 1
+            break
+          elsif charArrayB[stringIndex] < charArrayA[stringIndex] then
+            val = -1
+            break
+          end
+        end
+
+        val
+      }
+      descending_sort_update = ->(a,b) { 
+        charArrayB = b[:updated_at].chars
+        charArrayA = a[:updated_at].chars
+        val = 0
+
+        for stringIndex in 0..charArrayB.length - 1
+          if charArrayB[stringIndex] > charArrayA[stringIndex] then
+            val = 1
+            break
+          elsif charArrayB[stringIndex] < charArrayA[stringIndex] then
+            val = -1
+            break
+          end
+        end
+
+        val
+       }
+
+      if not match.nil? then
+        case match
+        when "comments"
+          issues_data.sort( &descending_sort_comment )
+        when "created"
+          issues_data.sort( &descending_sort_create )
+        when "updated"
+          issues_data.sort( &descending_sort_update )
+        end
+      end
+
+      puts "\n    issues_data ordered:    \n"
+      for issuesContentIndex in 0..5
+        if match == "comments"
+          puts issues_data[issuesContentIndex][:comments]
+        elsif match == "created"
+          puts issues_data[issuesContentIndex][:created_at]
+        else
+          puts issues_data[issuesContentIndex][:updated_at]
+        end
+        puts issuesContentIndex
+      end
+      puts "\n    Content finished    \n"
+    end
 
     # Returns the name to file containing info of given issue
     # Logic: 'position in request'.-.'repository owner'.-.'repository name'.-.'issue id in GitHub'.json
