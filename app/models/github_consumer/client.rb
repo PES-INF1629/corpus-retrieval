@@ -10,6 +10,7 @@ module GithubConsumer
     def register_request(url, &block)
       request = Typhoeus::Request.new url
       request.on_complete do |response|
+	#issues_set.warn_issue_processed
         if response.success?
           json = JSON.parse(response.body)
           if !json.is_a?(Hash) || json['message'].nil?

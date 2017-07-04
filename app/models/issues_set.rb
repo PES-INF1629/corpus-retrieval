@@ -13,6 +13,10 @@ class IssuesSet
   field :worker_id, type: String
   field :status, type: Integer, default: STATUSES.index(:processing)
 
+  # Returning 0 always
+  field :total_issues_amount, type: Integer, default: 0
+  field :issues_processed_amount, type: Integer, default: 0
+
   def self.destroy_olds!
     IssuesSet.order(:created_at.desc).offset(MAX_STORED).destroy_all
   end
@@ -41,5 +45,17 @@ class IssuesSet
   
   def processing?
     self.status == IssuesSet.status_of(:processing)
+  end
+
+  def set_total_issues_amount!(total_issues_amount)
+    self.total_issues_amount = total_issues_amount
+  end
+
+  def warn_issue_processed!
+    self.issues_processed_amount = self.issues_processed_amount + 1
+  end
+
+  def get_processed_percentage
+    self.issues_processed_amount.to_f / self.total_issues_amount
   end
 end

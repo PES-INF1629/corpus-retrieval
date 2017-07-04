@@ -44,7 +44,7 @@ This "div" will show every search made on this database.
         <% if set.finished? %>
           <p><%= link_to "(Download)", issue_download_path(set) %></p>
         <% else %>
-          <p>(<%= set.status_name.capitalize %>)</p>
+          <p>(<%= set.status_name.capitalize %> <%= set.issues_processed_amount %> / <%= set.total_issues_amount %>)</p>
         <% end %>
       </li>
     <%- end %>
@@ -57,7 +57,7 @@ Thsi is NOT the best way to update the user about the situation, would be better
 My guess is that i would need ajax/jquery i don't know. I don't understand this things.
 -->
 <script>
-var reloadTimer = window.setInterval(reloadPage,5000)
+var reloadTimer = window.setInterval(reloadPage,1000)
 
 function reloadPage () {
     <%- @sets.each do |set| %>

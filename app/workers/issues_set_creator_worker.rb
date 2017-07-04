@@ -11,7 +11,7 @@ class IssuesSetCreatorWorker
     IssuesSet.destroy_olds!
 
     begin
-      issues = GithubConsumer.get_issues query, match, label, comments
+      issues = GithubConsumer.get_issues query, match, label, comments, issues_set
       binary = ZipBinaryCreator.create_zip_for(issues)
 
       issues_set.finish! BSON::Binary.new(binary)

@@ -7,7 +7,7 @@ module GithubConsumer
     # TODO:
     # 1 - Order issues_content with match logic
     #######
-    def get_info_from_issues(issues_urls, comments, match)
+    def get_info_from_issues(issues_urls, comments, match, issues_set)
       unrecognizeds = [] # Needed?
       client = Client.new
       issues_data = []
@@ -15,6 +15,8 @@ module GithubConsumer
         issue_data = nil
         url = UrlBuilder.build(head_url)
         client.register_request url do |root_json|
+	    # Not changing the number of issues processed
+	    issues_set.warn_issue_processed!
             issues_data.push(
               id: root_json["id"], # To identify in json file
               url: root_json["url"],
@@ -31,6 +33,9 @@ module GithubConsumer
             )
         end
       end
+
+      # Not changing the number of total issues processed
+      issues_set.set_total_issues_amount!(issues_urls.length)
       client.run_requests
 
       issues_content = []
