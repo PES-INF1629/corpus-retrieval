@@ -2,15 +2,15 @@ module ZipBinaryCreator
   extend self
 
   def create_zip_for(files)
-    stringio = Zip::OutputStream.write_buffer do |zio|
+    zipOutputBuffer = Zip::OutputStream.write_buffer do |zipElement|
       files.each do |file|
         filename = file[:filename]
         content = file[:content]
-        zio.put_next_entry filename
-        zio.write content
+        zipElement.put_next_entry filename
+        zipElement.write content
       end
     end
-    stringio.rewind
-    stringio.sysread
+    zipOutputBuffer.rewind
+    zipOutputBuffer.sysread
   end
 end
