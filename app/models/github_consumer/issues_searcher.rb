@@ -5,7 +5,6 @@ module GithubConsumer
     MAX_PAGES = 1
 
     PARAMS_COMBINATIONS = [
-      {sort: nil, order: nil}, # best match
       {sort: "comments", order: "desc"},
       {sort: "created", order: "desc"},
       {sort: "comments", order: "asc", reversed: true},
@@ -21,13 +20,23 @@ module GithubConsumer
       all_head_urls = []
       client = Client.new
       items = []
-      PARAMS_COMBINATIONS.each_with_index do |params, i|
-        url = UrlBuilder.build(issues_url, 1, params[:sort], params[:order])
+      if match.nil? then # best match
+        url = UrlBuilder.build(issues_url, 1, nil, nil)
         client.register_request url do |first_page_json|
-          items = get_items_from_pages(issues_url, first_page_json, params)
+          items = get_items_from_pages(issues_url, first_page_json, {sort: nil, order: nil})
 
           # merge urls
-          all_head_urls[i] = head_urls_from(items, params[:reversed])
+          all_head_urls[0] = head_urls_from(items, nil)
+        end
+      else
+        PARAMS_COMBINATIONS.each_with_index do |params, i|
+          url = UrlBuilder.build(issues_url, 1, params[:sort], params[:order])
+          client.register_request url do |first_page_json|
+            items = get_items_from_pages(issues_url, first_page_json, params)
+
+            # merge urls
+            all_head_urls[i] = head_urls_from(items, params[:reversed])
+          end
         end
       end
       client.run_requests
