@@ -97,47 +97,29 @@ module GithubConsumer
 
       case match
       when "comments"
-        ordered_data = issues_data.sort! { |a, b| b[:comments] <=> a[:comments] }
+        issues_data.sort! { |a, b| b[:comments] <=> a[:comments] }
       when "created"
-        ordered_data = issues_data.sort! { |a, b| b[:created_at] <=> a[:created_at] }
+        issues_data.sort! { |a, b| b[:created_at] <=> a[:created_at] }
       when "updated"
-        ordered_data = issues_data.sort! { |a, b| b[:updated_at] <=> a[:updated_at] }
+        issues_data.sort! { |a, b| b[:updated_at] <=> a[:updated_at] }
       else # best match, already ordered
-        ordered_data = issues_data
+        issues_data
       end
 
-      ### Tests
       if not match.nil? then
-        puts "    ordered_data ordered in \"#{match}\", showing first 5:"
-        for dataContentIndex in 0..4
-          if match == "comments"
-            puts ordered_data[dataContentIndex][:comments]
-          elsif match == "created"
-            puts ordered_data[dataContentIndex][:created_at]
-          elsif match == "updated"
-            puts ordered_data[dataContentIndex][:updated_at]
-          end
-          if dataContentIndex == -1 then
-            puts "    Content finished "
-          end
+        puts "    All ordered_data ordered in \"#{match}\":"
+        for dataContentIndex in 0..issues_data.length - 1
+            if match == "comments"
+              puts issues_data[dataContentIndex][:comments]
+            elsif match == "created"
+              puts issues_data[dataContentIndex][:created_at]
+            elsif match == "updated"
+              puts issues_data[dataContentIndex][:updated_at]
+            end
         end
       end
-      #if not match.nil? then
-      #  puts "    All ordered_data ordered in \"#{match}\":"
-      #  for dataContentIndex in 0..ordered_data.length - 1
-      #  if match == "comments"
-      #    puts ordered_data[dataContentIndex][:comments]
-      #  elsif match == "created"
-      #    puts ordered_data[dataContentIndex][:created_at]
-      #  elsif match == "updated"
-      #    puts ordered_data[dataContentIndex][:updated_at]
-      #  end
-      #  if dataContentIndex == issues_data.length - 1 then
-      #    puts "    Content finished "
-      #  end
-      #end
 
-      ordered_data
+      issues_data
     end
 
     # Returns the name to file containing info of given issue
