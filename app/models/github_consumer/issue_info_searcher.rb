@@ -3,12 +3,7 @@ module GithubConsumer
     extend self
 
     # Builds structure representing info inside each file in corpus and returns it (doesn't build file nor corpus, only info)
-    #######
-    # TODO:
-    # 1 - Order issues_content with match logic
-    #######
     def get_info_from_issues(issues_urls, comments, match, issues_set)
-      unrecognizeds = [] # Needed?
       client = Client.new
       issues_data = []
       issues_urls.each_with_index do |head_url, i|
@@ -38,14 +33,14 @@ module GithubConsumer
       #issues_set.set_total_issues_amount!(issues_urls.length)
       client.run_requests
 
-      order_structure(issues_data, match)
+      ordered_data = order_structure(issues_data, match)
 
       issues_content = []
 
       # For comments retrieving
       client = Client.new
 
-      issues_data.compact.each.with_index do |issue_data, i|
+      ordered_data.compact.each.with_index do |issue_data, i|
         
         filename = file_name_from(i, issue_data)
         labels = []
@@ -97,72 +92,52 @@ module GithubConsumer
 
   private
 
-    # Order the initial structure
-    #######
-    # TODO:
-    # 1 - fix order error in most_updated and most_recent
-    #######
+    # Returns a ordered version of the received structure
     def order_structure(issues_data, match)
 
-      descending_sort_comment = ->(a,b) { b[:comments] <=> a[:comments] }
-      descending_sort_create = ->(a,b) { 
-        charArrayB = b[:created_at].chars
-        charArrayA = a[:created_at].chars
-        val = 0
+      case match
+      when "comments"
+        ordered_data = issues_data.sort! { |a, b| b[:comments] <=> a[:comments] }
+      when "created"
+        ordered_data = issues_data.sort! { |a, b| b[:created_at] <=> a[:created_at] }
+      when "updated"
+        ordered_data = issues_data.sort! { |a, b| b[:updated_at] <=> a[:updated_at] }
+      else # best match, already ordered
+        ordered_data = issues_data
+      end
 
-        for stringIndex in 0..charArrayB.length - 1
-          if charArrayB[stringIndex] > charArrayA[stringIndex] then
-            val = 1
-            break
-          elsif charArrayB[stringIndex] < charArrayA[stringIndex] then
-            val = -1
-            break
-          end
-        end
-
-        val
-      }
-      descending_sort_update = ->(a,b) { 
-        charArrayB = b[:updated_at].chars
-        charArrayA = a[:updated_at].chars
-        val = 0
-
-        for stringIndex in 0..charArrayB.length - 1
-          if charArrayB[stringIndex] > charArrayA[stringIndex] then
-            val = 1
-            break
-          elsif charArrayB[stringIndex] < charArrayA[stringIndex] then
-            val = -1
-            break
-          end
-        end
-
-        val
-       }
-
+      ### Tests
       if not match.nil? then
-        case match
-        when "comments"
-          issues_data.sort( &descending_sort_comment )
-        when "created"
-          issues_data.sort( &descending_sort_create )
-        when "updated"
-          issues_data.sort( &descending_sort_update )
+        puts "    ordered_data ordered in \"#{match}\", showing first 5:"
+        for dataContentIndex in 0..4
+          if match == "comments"
+            puts ordered_data[dataContentIndex][:comments]
+          elsif match == "created"
+            puts ordered_data[dataContentIndex][:created_at]
+          elsif match == "updated"
+            puts ordered_data[dataContentIndex][:updated_at]
+          end
+          if dataContentIndex == -1 then
+            puts "    Content finished "
+          end
         end
       end
+      #if not match.nil? then
+      #  puts "    All ordered_data ordered in \"#{match}\":"
+      #  for dataContentIndex in 0..ordered_data.length - 1
+      #  if match == "comments"
+      #    puts ordered_data[dataContentIndex][:comments]
+      #  elsif match == "created"
+      #    puts ordered_data[dataContentIndex][:created_at]
+      #  elsif match == "updated"
+      #    puts ordered_data[dataContentIndex][:updated_at]
+      #  end
+      #  if dataContentIndex == issues_data.length - 1 then
+      #    puts "    Content finished "
+      #  end
+      #end
 
-      puts "\n    issues_data ordered:    \n"
-      for issuesContentIndex in 0..5
-        if match == "comments"
-          puts issues_data[issuesContentIndex][:comments]
-        elsif match == "created"
-          puts issues_data[issuesContentIndex][:created_at]
-        else
-          puts issues_data[issuesContentIndex][:updated_at]
-        end
-        puts issuesContentIndex
-      end
-      puts "\n    Content finished    \n"
+      ordered_data
     end
 
     # Returns the name to file containing info of given issue

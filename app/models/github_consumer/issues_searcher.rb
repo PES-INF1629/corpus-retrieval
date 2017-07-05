@@ -5,6 +5,7 @@ module GithubConsumer
     MAX_PAGES = 1
 
     PARAMS_COMBINATIONS = [
+      {sort: nil, order: nil}, # best match
       {sort: "comments", order: "desc"},
       {sort: "created", order: "desc"},
       {sort: "comments", order: "asc", reversed: true},
@@ -12,15 +13,12 @@ module GithubConsumer
     ]
 
     # Builds the main query link and returns the organized structure with the info from each issue
-    #######
-    # TODO: See if we need match in here
-    #######
     def get_all_issues_urls(query, match, label)
       issues_url = "https://api.github.com/search/issues?q=#{query.gsub(" ","+")}+#{label}+is:issue&per_page=100"
       all_head_urls = []
       client = Client.new
       items = []
-      if match.nil? then # best match
+      if match.nil? then # best match only
         url = UrlBuilder.build(issues_url, 1, nil, nil)
         client.register_request url do |first_page_json|
           items = get_items_from_pages(issues_url, first_page_json, {sort: nil, order: nil})
@@ -59,7 +57,7 @@ module GithubConsumer
       is_reversed ? head_urls.reverse : head_urls
     end
 
-    # Does the remaining queries and returns a structure with "items" JSON blocks (each block is a issue to request)
+    # Goes to remaining pages and returns a structure with "items" JSON blocks (each block is a issue to request)
     def get_items_from_pages(issues_url, first_page_json, params)
       total_items = first_page_json["total_count"]
       total_pages = [total_items / 100, MAX_PAGES].min
