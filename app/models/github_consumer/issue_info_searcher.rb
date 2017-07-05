@@ -35,7 +35,7 @@ module GithubConsumer
       end
 
       # Not changing the number of total issues processed
-      issues_set.set_total_issues_amount!(issues_urls.length)
+      #issues_set.set_total_issues_amount!(issues_urls.length)
       client.run_requests
 
       order_structure(issues_data, match)

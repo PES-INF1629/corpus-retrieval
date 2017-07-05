@@ -47,15 +47,22 @@ class IssuesSet
     self.status == IssuesSet.status_of(:processing)
   end
 
-  def set_total_issues_amount!(total_issues_amount)
-    self.total_issues_amount = total_issues_amount
+  def set_total_issues_amount!(amount)
+    self.update_attributes!(total_issues_amount: amount)
   end
 
   def warn_issue_processed!
-    self.issues_processed_amount = self.issues_processed_amount + 1
+    amount = self.issues_processed_amount + 1
+    self.update_attributes!(issues_processed_amount: amount)
   end
 
   def get_processed_percentage
-    self.issues_processed_amount.to_f / self.total_issues_amount
+    percentage = 0
+    
+    if(self.total_issues_amount != 0)
+        percentage = ((self.issues_processed_amount.to_f / self.total_issues_amount)*100).to_i
+    end
+        
+    return percentage
   end
 end
