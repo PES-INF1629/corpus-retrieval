@@ -15,6 +15,7 @@ module GithubConsumer
             issues_data.push(
               id: root_json["id"], # To identify in json file
               url: root_json["url"],
+              html_url: root_json["html_url"],
               title: root_json["title"],
               user: root_json["user"]["login"],
               labels: root_json["labels"],
@@ -33,14 +34,14 @@ module GithubConsumer
       #issues_set.set_total_issues_amount!(issues_urls.length)
       client.run_requests
 
-      ordered_data = order_structure(issues_data, match)
+      order_structure(issues_data, match)
 
       issues_content = []
 
       # For comments retrieving
       client = Client.new
 
-      ordered_data.compact.each.with_index do |issue_data, i|
+      issues_data.compact.each.with_index do |issue_data, i|
         
         filename = file_name_from(i, issue_data)
         labels = []
@@ -53,6 +54,7 @@ module GithubConsumer
         issues_content.push(
           filename: filename,
           url: issue_data[:url],
+          html_url: issue_data[:html_url],
           title: issue_data[:title],
           user: issue_data[:user],
           labels: labels,
@@ -107,7 +109,7 @@ module GithubConsumer
       end
 
       if not match.nil? then
-        puts "    All ordered_data ordered in \"#{match}\":"
+        puts "    All issues_data ordered in \"#{match}\":"
         for dataContentIndex in 0..issues_data.length - 1
             if match == "comments"
               puts issues_data[dataContentIndex][:comments]

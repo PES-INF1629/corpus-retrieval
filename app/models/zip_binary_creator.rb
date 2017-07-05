@@ -18,6 +18,7 @@ module ZipBinaryCreator
 	jsonFile = "{\n"
 
 	jsonFile += "\"url\": \"#{file[:url]}\",\n"
+	jsonFile += "\"html_url\": \"#{file[:html_url]}\",\n"
 	jsonFile += "\"title\": \"#{file[:title]}\",\n"
 	jsonFile += "\"user\": \"#{file[:user]}\",\n"
 	jsonFile += "\"labels\": [\n"
