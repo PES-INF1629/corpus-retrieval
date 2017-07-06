@@ -2,7 +2,7 @@ module GithubConsumer
   module IssuesSearcher
     extend self
 
-    MAX_PAGES = 1
+    MAX_PAGES = 10
 
     PARAMS_COMBINATIONS = [
       {sort: nil, order: nil}, # best match

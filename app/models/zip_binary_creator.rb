@@ -14,6 +14,8 @@ module ZipBinaryCreator
     zipOutputBuffer.sysread
   end
 
+private
+
   def create_json(file)
 	jsonFile = "{\n"
 
@@ -37,6 +39,8 @@ module ZipBinaryCreator
     
 	jsonFile += "\t],\n"
 
+	treatSpecialChars(file)
+	
 	if file[:comments].nil? then
 		jsonFile += "\t\"body\": \"#{file[:body]}\"\n"
 	else
@@ -47,8 +51,9 @@ module ZipBinaryCreator
 
 
 		file[:comments_content].each_with_index { |comment_content, index|
+			treatSpecialChars(comment_content)
 			jsonFile += "\t{\n"
-			jsonFile += "\t\t\"user\": \"#{comment_content[:user]}\"\n"
+			jsonFile += "\t\t\"user\": \"#{comment_content[:user]}\",\n"
 			jsonFile += "\t\t\"body\": \"#{comment_content[:body]}\"\n"
 
 			if index == file[:comments_content].length - 1 then
@@ -62,5 +67,15 @@ module ZipBinaryCreator
 	end
 
 	jsonFile += "}"
+  end
+
+  def treatSpecialChars(hash)
+	hash[:body].gsub!("\n","\\n")
+	hash[:body].gsub!("\r","\\r")
+	hash[:body].gsub!("\t","\\t")
+	hash[:body].gsub!("\"","\\\"")
+	hash[:body].gsub!("\'","\\\'")
+	hash[:body].gsub!("\0","\\0")
+	hash[:body].gsub!("\\","\\\\")
   end
 end

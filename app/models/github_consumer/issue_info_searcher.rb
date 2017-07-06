@@ -33,9 +33,13 @@ module GithubConsumer
       # Not changing the number of total issues processed
       #issues_set.set_total_issues_amount!(issues_urls.length)
       client.run_requests
-
-      order_structure(issues_data, match)
-
+      
+      ###Test
+      #issues_dataSizeBefore = issues_data.length
+      #issues_dataBefore = issues_data.clone
+      
+      order_structure(issues_data, match, issues_urls)
+      
       issues_content = []
 
       # For comments retrieving
@@ -78,7 +82,7 @@ module GithubConsumer
       client.run_requests
 
       ### Visual test...
-      #puts "\n    Some issue content:    \n"
+      #puts "    Some issue content:"
       #for issuesContentIndex in 0..issues_content.length - 1
       #  if not issues_content[issuesContentIndex][:body].blank? and # Issue has body
       #      (not comments or issues_content[issuesContentIndex][:comments] == 3) and # Has 3 comments
@@ -87,7 +91,25 @@ module GithubConsumer
       #   break
       #  end
       #end
-      #puts "\n    Content finished    \n"
+      #puts "    Content finished"
+      #puts "    1    issues_urls size:"
+      #puts issues_urls.length
+      #puts "    2    issues_data size before ordering:"
+      #puts issues_dataSizeBefore
+      #puts "    3    issues_data size after ordering:"
+      #puts issues_data.length
+      #puts "    4    issues_content size:"
+      #puts issues_content.length
+      #puts "      issues_data before order best match first 5:"
+      #for i in 0..4
+      #  puts issues_dataBefore[i][:url]
+      #end
+      #puts "      finished"
+      #puts "      issues_data after order best match first 5:"
+      #for i in 0..4
+      #  puts issues_data[i][:url]
+      #end
+      #puts "      finished"
 
       issues_content
     end
@@ -95,7 +117,7 @@ module GithubConsumer
   private
 
     # Returns a ordered version of the received structure
-    def order_structure(issues_data, match)
+    def order_structure(issues_data, match, issues_urls)
 
       case match
       when "comments"
@@ -104,22 +126,32 @@ module GithubConsumer
         issues_data.sort! { |a, b| b[:created_at] <=> a[:created_at] }
       when "updated"
         issues_data.sort! { |a, b| b[:updated_at] <=> a[:updated_at] }
-      else # best match, already ordered
-        issues_data
+      else # best match
+        tempStructure = []
+        issues_urls.each.with_index do |url, urlIndex| # Using urls index as order parameter
+          issues_data.each.with_index do |issueData, issueDataIndex|
+            if url == issueData[:url] then # Storing data in right position
+              tempStructure.push(issueData)
+              break
+            end
+          end
+        end
+        issues_data = tempStructure.clone
       end
 
-      if not match.nil? then
-        puts "    All issues_data ordered in \"#{match}\":"
-        for dataContentIndex in 0..issues_data.length - 1
-            if match == "comments"
-              puts issues_data[dataContentIndex][:comments]
-            elsif match == "created"
-              puts issues_data[dataContentIndex][:created_at]
-            elsif match == "updated"
-              puts issues_data[dataContentIndex][:updated_at]
-            end
-        end
-      end
+      ## Tests
+      #puts "    All issues_data ordered in \"#{if not match.nil? then match else "best match" end}\":"
+      #issues_data.each do |issue|
+      #  if match == "comments"
+      #    puts issue[:comments]
+      #  elsif match == "created"
+      #    puts issue[:created_at]
+      #  elsif match == "updated"
+      #    puts issue[:updated_at]
+      #  else
+      #    puts issue[:url]
+      #  end
+      #end
 
       issues_data
     end
