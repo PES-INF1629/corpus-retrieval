@@ -17,35 +17,37 @@ module ZipBinaryCreator
   def create_json(file)
 	jsonFile = "{\n"
 
-	jsonFile += "\"url\": \"#{file[:url]}\",\n"
-	jsonFile += "\"html_url\": \"#{file[:html_url]}\",\n"
-	jsonFile += "\"title\": \"#{file[:title]}\",\n"
-	jsonFile += "\"user\": \"#{file[:user]}\",\n"
-	jsonFile += "\"labels\": [\n"
+	jsonFile += "\t\"url\": \"#{file[:url]}\",\n"
+	jsonFile += "\t\"html_url\": \"#{file[:html_url]}\",\n"
+	jsonFile += "\t\"title\": \"#{file[:title]}\",\n"
+	jsonFile += "\t\"user\": \"#{file[:user]}\",\n"
+	jsonFile += "\t\"labels\": [\n"
 
 	file[:labels].each_with_index { |label, index|
-		jsonFile += "\t{"
+		jsonFile += "\t\t{\n"
 		
-		jsonFile += "\t\t\"name\": \"#{label[:name]}\"\n"
+		jsonFile += "\t\t\t\"name\": \"#{label[:name]}\"\n"
 
 		if index == file[:labels].length - 1 then
-			jsonFile += "\t}\n"
+			jsonFile += "\t\t}\n"
 		else
-			jsonFile += "\t},\n"
+			jsonFile += "\t\t},\n"
 		end
 	}
+    
+	jsonFile += "\t],\n"
 
 	if file[:comments].nil? then
-		jsonFile += "\"body\": \"#{file[:body]}\"\n"
+		jsonFile += "\t\"body\": \"#{file[:body]}\"\n"
 	else
-		jsonFile += "\"body\": \"#{file[:body]}\",\n"
+		jsonFile += "\t\"body\": \"#{file[:body]}\",\n"
 
-		jsonFile += "\"comments\": #{file[:comments]},\n"
-		jsonFile += "\"comments_content\": [\n"
+		jsonFile += "\t\"comments\": #{file[:comments]},\n"
+		jsonFile += "\t\"comments_content\": [\n"
 
 
 		file[:comments_content].each_with_index { |comment_content, index|
-			jsonFile += "\t{"
+			jsonFile += "\t{\n"
 			jsonFile += "\t\t\"user\": \"#{comment_content[:user]}\"\n"
 			jsonFile += "\t\t\"body\": \"#{comment_content[:body]}\"\n"
 
@@ -56,7 +58,7 @@ module ZipBinaryCreator
 			end
 		}
 
-		jsonFile += "]\n"
+		jsonFile += "\t]\n"
 	end
 
 	jsonFile += "}"

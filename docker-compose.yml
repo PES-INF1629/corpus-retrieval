@@ -11,10 +11,10 @@ web:
   environment:
     - REDIS_URL=redis://redis.local/0
     - MONGODB_HOST=mongo.local
-#    - CLIENT_ID=a22c62496f6c7d520782
-#    - CLIENT_SECRET=9e01f90cfca708c1ca00401635fcf9500aa3b6b2
-    - CLIENT_ID=af4fd26055849b605cf3
-    - CLIENT_SECRET=b92d20f8b1d529bc111c7f82af9203410f6656f2
+    - CLIENT_ID=a22c62496f6c7d520782
+    - CLIENT_SECRET=9e01f90cfca708c1ca00401635fcf9500aa3b6b2
+#    - CLIENT_ID=af4fd26055849b605cf3
+#    - CLIENT_SECRET=b92d20f8b1d529bc111c7f82af9203410f6656f2
     - SLAVES=
 
 sidekiq:
@@ -28,10 +28,10 @@ sidekiq:
   environment:
     - REDIS_URL=redis://redis.local/0
     - MONGODB_HOST=mongo.local
-#    - CLIENT_ID=a22c62496f6c7d520782
-#    - CLIENT_SECRET=9e01f90cfca708c1ca00401635fcf9500aa3b6b2
-    - CLIENT_ID=af4fd26055849b605cf3
-    - CLIENT_SECRET=b92d20f8b1d529bc111c7f82af9203410f6656f2
+    - CLIENT_ID=a22c62496f6c7d520782
+    - CLIENT_SECRET=9e01f90cfca708c1ca00401635fcf9500aa3b6b2
+#    - CLIENT_ID=af4fd26055849b605cf3
+#    - CLIENT_SECRET=b92d20f8b1d529bc111c7f82af9203410f6656f2
     - SLAVES=
 
 redis:
