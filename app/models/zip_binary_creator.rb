@@ -44,7 +44,17 @@ module ZipBinaryCreator
 		jsonFile += "\"comments_content\": [\n"
 
 
-		#file[:comments_content].each_with_index { |comments_content, index|
+		file[:comments_content].each_with_index { |comment_content, index|
+			jsonFile += "\t{"
+			jsonFile += "\t\t\"user\": \"#{comment_content[:user]}\"\n"
+			jsonFile += "\t\t\"body\": \"#{comment_content[:body]}\"\n"
+
+			if index == file[:comments_content].length - 1 then
+				jsonFile += "\t}\n"
+			else
+				jsonFile += "\t},\n"
+			end
+		}
 
 		jsonFile += "]\n"
 	end
