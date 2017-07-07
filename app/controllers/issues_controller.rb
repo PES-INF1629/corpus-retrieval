@@ -1,7 +1,9 @@
 class IssuesController < ApplicationController
 
   def index
-    @sets = IssuesSet.order(:created_at.desc).all.to_a
+    if not IssuesSet.order(:created_at.desc).all.nil?
+      @sets = IssuesSet.order(:created_at.desc).all.to_a
+    end
   end
 
   # When a download request is make.
