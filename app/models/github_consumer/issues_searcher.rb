@@ -2,14 +2,16 @@ module GithubConsumer
   module IssuesSearcher
     extend self
 
-    MAX_PAGES = 10
+    MAX_PAGES = 2
 
     PARAMS_COMBINATIONS = [
       {sort: nil, order: nil}, # best match
       {sort: "comments", order: "desc"},
       {sort: "created", order: "desc"},
+      {sort: "updated", order: "desc"},
       {sort: "comments", order: "asc", reversed: true},
-      {sort: "created", order: "asc", reversed: true}
+      {sort: "created", order: "asc", reversed: true},
+      {sort: "updated", order: "asc", reversed: true}
     ]
 
     # Builds the main query link and returns the organized structure with the info from each issue
@@ -27,13 +29,13 @@ module GithubConsumer
           all_head_urls[0] = head_urls_from(items, nil)
         end
       else
-        PARAMS_COMBINATIONS.each_with_index do |params, i|
+        PARAMS_COMBINATIONS.each_with_index do |params, paramsIndex|
           url = UrlBuilder.build(issues_url, 1, params[:sort], params[:order])
           client.register_request url do |first_page_json|
             items = get_items_from_pages(issues_url, first_page_json, params)
 
             # merge urls
-            all_head_urls[i] = head_urls_from(items, params[:reversed])
+            all_head_urls[paramsIndex] = head_urls_from(items, params[:reversed])
           end
         end
       end

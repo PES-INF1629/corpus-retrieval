@@ -70,12 +70,23 @@ private
   end
 
   def treatSpecialChars(hash)
-	hash[:body].gsub!("\n","\\n")
-	hash[:body].gsub!("\r","\\r")
-	hash[:body].gsub!("\t","\\t")
-	hash[:body].gsub!("\"","\\\"")
-	hash[:body].gsub!("\'","\\\'")
-	hash[:body].gsub!("\0","\\0")
-	hash[:body].gsub!("\\","\\\\")
+  	if not hash[:body].nil? then # In case it doesn't have body
+		hash[:body].gsub!("\n","\\n")
+		hash[:body].gsub!("\r","\\r")
+		hash[:body].gsub!("\t","\\t")
+		hash[:body].gsub!("\"","\\\"")
+		hash[:body].gsub!("\'","\\\'")
+		hash[:body].gsub!("\0","\\0")
+		hash[:body].gsub!("\\","\\\\")
+		if not hash[:title].nil? then
+			hash[:title].gsub!("\n","\\n")
+			hash[:title].gsub!("\r","\\r")
+			hash[:title].gsub!("\t","\\t")
+			hash[:title].gsub!("\"","\\\"")
+			hash[:title].gsub!("\'","\\\'")
+			hash[:title].gsub!("\0","\\0")
+			hash[:title].gsub!("\\","\\\\")
+		end
+	end
   end
 end

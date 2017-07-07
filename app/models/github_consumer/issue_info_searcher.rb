@@ -35,17 +35,17 @@ module GithubConsumer
       client.run_requests
       
       ###Test
-      #issues_dataSizeBefore = issues_data.length
+      issues_dataSizeBefore = issues_data.length
       #issues_dataBefore = issues_data.clone
       
-      order_structure(issues_data, match, issues_urls)
+      ordered_data = order_structure(issues_data, match, issues_urls)
       
       issues_content = []
 
       # For comments retrieving
       client = Client.new
 
-      issues_data.compact.each.with_index do |issue_data, i|
+      ordered_data.compact.each.with_index do |issue_data, i|
         
         filename = file_name_from(i, issue_data)
         labels = []
@@ -96,8 +96,8 @@ module GithubConsumer
       #puts issues_urls.length
       #puts "    2    issues_data size before ordering:"
       #puts issues_dataSizeBefore
-      #puts "    3    issues_data size after ordering:"
-      #puts issues_data.length
+      #puts "    3    ordered_data size after ordering:"
+      #puts ordered_data.length
       #puts "    4    issues_content size:"
       #puts issues_content.length
       #puts "      issues_data before order best match first 5:"
@@ -119,29 +119,28 @@ module GithubConsumer
     # Returns a ordered version of the received structure
     def order_structure(issues_data, match, issues_urls)
 
+      ordered_data = []
       case match
       when "comments"
-        issues_data.sort! { |a, b| b[:comments] <=> a[:comments] }
+        ordered_data = issues_data.sort! { |a, b| b[:comments] <=> a[:comments] }
       when "created"
-        issues_data.sort! { |a, b| b[:created_at] <=> a[:created_at] }
+        ordered_data = issues_data.sort! { |a, b| b[:created_at] <=> a[:created_at] }
       when "updated"
-        issues_data.sort! { |a, b| b[:updated_at] <=> a[:updated_at] }
+        ordered_data = issues_data.sort! { |a, b| b[:updated_at] <=> a[:updated_at] }
       else # best match
-        tempStructure = []
         issues_urls.each.with_index do |url, urlIndex| # Using urls index as order parameter
           issues_data.each.with_index do |issueData, issueDataIndex|
             if url == issueData[:url] then # Storing data in right position
-              tempStructure.push(issueData)
+              ordered_data.push(issueData)
               break
             end
           end
         end
-        issues_data = tempStructure.clone
       end
 
       ## Tests
-      #puts "    All issues_data ordered in \"#{if not match.nil? then match else "best match" end}\":"
-      #issues_data.each do |issue|
+      #puts "    ordered_data ordered in \"#{if not match.nil? then match else "best match" end}\":"
+      #ordered_data.each do |issue|
       #  if match == "comments"
       #    puts issue[:comments]
       #  elsif match == "created"
@@ -153,7 +152,7 @@ module GithubConsumer
       #  end
       #end
 
-      issues_data
+      ordered_data
     end
 
     # Returns the name to file containing info of given issue
