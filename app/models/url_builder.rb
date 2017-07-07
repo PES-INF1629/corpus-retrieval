@@ -2,7 +2,7 @@ module UrlBuilder
   extend self
 
   # We set domains to make request in parallel
-  DOMAINS = ["api.github.com"] + ENV['SLAVES'].split(",")
+  DOMAINS = ["api.github.com"] + #ENV['SLAVES'].split(",") # We don't use slaves(proxies) in this version
 
   # Build urls to be passed for the domains?
   def build(url, page=nil, sort=nil, order=nil)
