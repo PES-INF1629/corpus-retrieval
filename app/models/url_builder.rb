@@ -48,14 +48,14 @@ private
   end
   #set the Auth key credentials. This will allow requests up to 5000.
   def client_env_vars
-    @clientindex ||= 0
+    #@clientindex ||= 0 # slave usage
 
     params = {
-      client_id: ENV['CLIENT_ID'].split(',')[@clientindex],
-      client_secret: ENV['CLIENT_SECRET'].split(',')[@clientindex],
+      client_id: ENV['CLIENT_ID'],#.split(',')[@clientindex], # slave usage
+      client_secret: ENV['CLIENT_SECRET']#.split(',')[@clientindex], # slave usage
     }
-    @clientindex += 1
-    @clientindex = @clientindex % ENV['CLIENT_ID'].split(",").size
+    #@clientindex += 1 # slave usage
+    #@clientindex = @clientindex % ENV['CLIENT_ID'].split(",").size # slave usage
     params
   end
 end
