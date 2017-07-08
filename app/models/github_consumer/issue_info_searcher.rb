@@ -28,10 +28,6 @@ module GithubConsumer
       end
       client.run_requests
       
-      ###Test
-      #issues_dataSizeBefore = issues_raw_data.length
-      #issues_dataBefore = issues_raw_data.clone
-      
       ordered_data = order_structure(issues_raw_data, match, issues_urls)
       
       issues_processed_data = []
@@ -74,36 +70,6 @@ module GithubConsumer
       end
       client.run_requests
 
-      ### Visual test...
-      #puts "    Some issue content:"
-      #for issuesContentIndex in 0..issues_processed_data.length - 1
-      #  if not issues_processed_data[issuesContentIndex][:body].blank? and # Issue has body
-      #      (not comments or issues_processed_data[issuesContentIndex][:comments] == 3) and # Has 3 comments
-      #      (not issues_processed_data[issuesContentIndex][:labels].nil? and issues_processed_data[issuesContentIndex][:labels].length == 2) then # Has two labels
-      #    puts issues_processed_data[issuesContentIndex]
-      #   break
-      #  end
-      #end
-      #puts "    Content finished"
-      #puts "    1    issues_urls size:"
-      #puts issues_urls.length
-      #puts "    2    issues_raw_data size before ordering:"
-      #puts issues_dataSizeBefore
-      #puts "    3    ordered_data size after ordering:"
-      #puts ordered_data.length
-      #puts "    4    issues_processed_data size:"
-      #puts issues_processed_data.length
-      #puts "      issues_raw_data before order best match first 5:"
-      #for i in 0..4
-      #  puts issues_dataBefore[i][:url]
-      #end
-      #puts "      finished"
-      #puts "      issues_raw_data after order best match first 5:"
-      #for i in 0..4
-      #  puts issues_raw_data[i][:url]
-      #end
-      #puts "      finished"
-
       issues_processed_data
     end
 
@@ -130,20 +96,6 @@ module GithubConsumer
           end
         end
       end
-
-      ## Tests
-      #puts "    ordered_data ordered in \"#{if not match.nil? then match else "best match" end}\":"
-      #ordered_data.each do |issue|
-      #  if match == "comments"
-      #    puts issue[:comments]
-      #  elsif match == "created"
-      #    puts issue[:created_at]
-      #  elsif match == "updated"
-      #    puts issue[:updated_at]
-      #  else
-      #    puts issue[:url]
-      #  end
-      #end
 
       ordered_data
     end

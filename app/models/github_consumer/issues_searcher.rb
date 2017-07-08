@@ -42,12 +42,6 @@ module GithubConsumer
       end
       client.run_requests
       issues_urls.reduce(:|)
-      
-      ### Visual test...
-      #puts "\nPrimeira    issue:\n"
-      #puts issues_urls[0]
-      #puts "\nIssue     acabou\n"
-      #exit
     end
   private
 
