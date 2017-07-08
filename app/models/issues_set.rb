@@ -4,7 +4,7 @@ class IssuesSet
 
   class StatusDoesNotExist < StandardError; end
 
-  STATUSES = %i[processing finished failed]
+  STATUSES = %i[processing finished failed] # zip file being processed's possible statuses
   MAX_STORED = 30
 
   field :query, type: String
@@ -13,7 +13,7 @@ class IssuesSet
   field :worker_id, type: String
   field :status, type: Integer, default: STATUSES.index(:processing)
 
-  # Returning 0 always
+  # For processing percentage using
   field :total_issues_amount, type: Integer, default: 0
   field :issues_processed_amount, type: Integer, default: 0
 
@@ -22,8 +22,8 @@ class IssuesSet
   end
 
   def self.status_of(status_symbol)
-    inx = STATUSES.index(status_symbol)
-    (inx >= 0) ? inx : (raise StatusDoesNotExist, status_symbol.inspect)
+    index = STATUSES.index(status_symbol)
+    (index >= 0) ? index : (raise StatusDoesNotExist, status_symbol.inspect)
   end
 
   def finish!(zip)
@@ -58,11 +58,9 @@ class IssuesSet
 
   def get_processed_percentage
     percentage = 0
-    
     if(self.total_issues_amount != 0)
-        percentage = ((self.issues_processed_amount.to_f / self.total_issues_amount)*100).to_i
-    end
-        
-    return percentage
+      percentage = ((self.issues_processed_amount.to_f / self.total_issues_amount)*100).to_i
+    end 
+    percentage
   end
 end

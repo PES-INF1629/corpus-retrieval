@@ -2,9 +2,10 @@ module UrlBuilder
   extend self
 
   # We set domains to make request in parallel
-  DOMAINS = ["api.github.com"] #+ ENV['SLAVES'].split(",") # We don't use slaves(proxies) in this version
+  DOMAINS = ["api.github.com"] + ENV['SLAVES'].split(",")
 
-  # Build urls to be passed for the domains?
+  # Build urls to be passed for the domains, 3 last parameters when not received as arguments have nil value by default
+  # Works with main query url, issues urls and comments urls
   def build(url, page=nil, sort=nil, order=nil)
     uri = URI.parse(url)
     domain = next_domain
@@ -41,21 +42,22 @@ private
     domain
   end
 
-  #define the parameters of the Auth Key needed to request information in Github
+  # define the parameters of the Authentification Key needed to request information in Github
   def client_params
     cparams = client_env_vars
     "client_id=#{cparams[:client_id]}&client_secret=#{cparams[:client_secret]}"
   end
-  #set the Auth key credentials. This will allow requests up to 5000.
+
+  # set the Authentification key credentials. This will allow requests up to 5000 when slaves are used. In this version, it is not.
   def client_env_vars
-    #@clientindex ||= 0 # slave usage
+    @clientindex ||= 0
 
     params = {
-      client_id: ENV['CLIENT_ID'],#.split(',')[@clientindex], # slave usage
-      client_secret: ENV['CLIENT_SECRET']#.split(',')[@clientindex], # slave usage
+      client_id: ENV['CLIENT_ID'].split(',')[@clientindex],
+      client_secret: ENV['CLIENT_SECRET'].split(',')[@clientindex],
     }
-    #@clientindex += 1 # slave usage
-    #@clientindex = @clientindex % ENV['CLIENT_ID'].split(",").size # slave usage
+    @clientindex += 1
+    @clientindex = @clientindex % ENV['CLIENT_ID'].split(",").size
     params
   end
 end

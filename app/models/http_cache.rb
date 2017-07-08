@@ -1,4 +1,5 @@
 class HttpCache
+  # This class is used by the other gems, like Redis and Typhoes for requisitions and such. We didn't touch it.
   def initialize
     @redis = Redis.new url: ENV["REDISTOGO_URL"] || "redis://redis.local/0"
   end

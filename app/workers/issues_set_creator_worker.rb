@@ -3,8 +3,8 @@ class IssuesSetCreatorWorker
   sidekiq_options retry: false
 
   # Define the name of the zip
-  # Didn't understood IssuesSet
-  # Destroy olds just let the 30 recent files alive
+  # Calls class for issues requisition and passes data to class who builds zip
+  # Destroy olds just lets the 30 recent files alive
   def perform(query, match, label, comments)
     filename = query.gsub(/ +/, "_") + ".zip"
     issues_set = IssuesSet.create query: query, filename: filename, worker_id: self.jid
@@ -15,7 +15,7 @@ class IssuesSetCreatorWorker
       binary = ZipBinaryCreator.create_zip_for(issues)
 
       issues_set.finish! BSON::Binary.new(binary)
-    rescue Exception => e
+    rescue Exception => e # Treats exception when failing any requisition or zip building
       issues_set.update_attributes! status: IssuesSet.status_of(:failed)
       raise e
     end

@@ -9,7 +9,7 @@
 
 <!--
 This "form_tag" is responsabile for getting all information from client.
-After the client submit, everything will be send to "controllers/issues_controller.rb" method "search".
+After the client submits it, everything will be sent to "controllers/issues_controller.rb", method "search".
 -->
 <%= form_tag search_issues_path do |f| %>
     <input name="query">
@@ -35,7 +35,7 @@ After the client submit, everything will be send to "controllers/issues_controll
 This "div" will show every search made on this database.
 -->
 <div id="issues-sets-container">
-  <h2>Issues of another queries</h2>
+  <h2>Results of previous queries</h2>
   <ul class="issues-sets">
     <%- @sets.each do |set| %>
       <li class="issues-set">
@@ -52,9 +52,8 @@ This "div" will show every search made on this database.
 </div>
 
 <!--
-A little script that will refresh page every 5 seconds.
-Thsi is NOT the best way to update the user about the situation, would be better if someone knew one way to make ruby tell this page when the status from query change.
-My guess is that i would need ajax/jquery i don't know. I don't understand this things.
+A little script that will refresh the main page every 5 seconds.
+Used to inform query processing percentage "live".
 -->
 <script>
 var reloadTimer = window.setInterval(reloadPage,1000)
