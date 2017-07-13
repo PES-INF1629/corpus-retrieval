@@ -32,7 +32,7 @@ module GithubConsumer
           json_items = get_items_from_pages(main_query_url, first_page_json, matching)
 
           # merge urls
-          issues_data[orderIndex] = issues_issues_from(json_items, matching[:reversed], issues_set, comments)
+          issues_data[orderIndex] = issues_data_from(json_items, matching[:reversed], issues_set, comments)
         end
       end
       client.run_requests
@@ -42,7 +42,7 @@ module GithubConsumer
   private
 
     # Gets each issue data from JSON block
-    def issues_issues_from(json_items, is_reversed, issues_set, comments)
+    def issues_data_from(json_items, is_reversed, issues_set, comments)
       issues_data = []
       json_items.map do |issue_json|
         if not comments # Not finished processing issues
