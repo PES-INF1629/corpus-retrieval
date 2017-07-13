@@ -2,7 +2,8 @@ module GithubConsumer
   module IssuesSearcher
     extend self
 
-    MAX_PAGES = 3 # 3 x 7 match possibilities x 100 issues per page x 2 comments requisition per issue = 4200 requisitions max per query (not gonna happen, but seen as worst scenario)
+    # 3 (pages) x 7 (match possibilities) x 100 (issues per page) x 2 (comments requisition per issue) = 4200 requisitions max per query (not gonna happen, but seen as worst scenario)
+    MAX_PAGES = 3
 
     MATCHING_COMBINATIONS = [
       {sort: nil, order: nil, reversed: false}, # best match
@@ -15,43 +16,55 @@ module GithubConsumer
     ]
 
     # Builds the main query link and returns the organized structure with the info from each issue
-    def get_all_issues_urls(query, match, label)
+    def get_all_issues(query, label, issues_set, comments)
       main_query_url = "https://api.github.com/search/issues?q=#{query.gsub(" ","+")}+#{label}+is:issue&per_page=100"
-      issues_urls = []
+      issues_data = []
       client = Client.new
       json_items = []
 
-      if match.nil? then # best match only
-        url = UrlBuilder.build(main_query_url, 1, MATCHING_COMBINATIONS[0][:sort], MATCHING_COMBINATIONS[0][:order]) # Building url for first page in best match
+      # An estimation of total of issues, quickest and lamest way to inform it...
+      # The right way to do it is to inform the exact total of issues, but we are limited for now (only 3 pages)
+      issues_set.set_total_issues_amount!(MATCHING_COMBINATIONS.length * MAX_PAGES * 100)
+
+      MATCHING_COMBINATIONS.each_with_index do |matching, orderIndex|
+        url = UrlBuilder.build(main_query_url, 1, matching[:sort], matching[:order])
         client.register_request url do |first_page_json|
-          json_items = get_items_from_pages(main_query_url, first_page_json, MATCHING_COMBINATIONS[0])
+          json_items = get_items_from_pages(main_query_url, first_page_json, matching)
 
-          # merge urls - only one index in this case (only best match)
-          issues_urls[0] = issues_urls_from(json_items, MATCHING_COMBINATIONS[0][:reversed])
-        end
-      else # newest, update and most commented
-        MATCHING_COMBINATIONS.each_with_index do |matching, orderIndex|
-          url = UrlBuilder.build(main_query_url, 1, matching[:sort], matching[:order])
-          client.register_request url do |first_page_json|
-            json_items = get_items_from_pages(main_query_url, first_page_json, matching)
-
-            # merge urls
-            issues_urls[orderIndex] = issues_urls_from(json_items, matching[:reversed])
-          end
+          # merge urls
+          issues_data[orderIndex] = issues_issues_from(json_items, matching[:reversed], issues_set, comments)
         end
       end
       client.run_requests
-      issues_urls.reduce(:|)
+      issues_data.compact.flatten.uniq { |issue| issue[:id] }
     end
+
   private
 
-    # Gets "url" JSON block
-    def issues_urls_from(json_items, is_reversed)
-      issues_urls = json_items.map do |issue_json|
-        issue_json["url"]
+    # Gets each issue data from JSON block
+    def issues_issues_from(json_items, is_reversed, issues_set, comments)
+      issues_data = []
+      json_items.map do |issue_json|
+        if not comments # Not finished processing issues
+          issues_set.warn_issue_processed!
+        end
+        issues_data.push(
+            id: issue_json["id"], # used in JSON file to better identification
+            url: issue_json["url"],
+            html_url: issue_json["html_url"],
+            title: issue_json["title"],
+            user: issue_json["user"]["login"],
+            labels: issue_json["labels"],
+            body: issue_json["body"],
+            comments: issue_json["comments"], # Matching in most commented
+            comments_url: issue_json["comments_url"], # in case user requested comments
+            created_at: issue_json["created_at"], # Matching in newest
+            updated_at: issue_json["updated_at"], # Matching in recently updated
+            score: issue_json["score"] # Matching in best match
+          )
       end
 
-      is_reversed ? issues_urls.reverse : issues_urls
+      is_reversed ? issues_data.reverse : issues_data
     end
 
     # Goes to remaining pages and returns a structure with "items" JSON blocks (each block is a issue to request)

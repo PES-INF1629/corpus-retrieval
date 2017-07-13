@@ -1,40 +1,16 @@
 module GithubConsumer
-  module IssueInfoSearcher
+  module IssueInfoRetriever
     extend self
 
     # Builds structure containing issues data
-    def get_info_from_issues(issues_urls, comments, match, issues_set)
-      client = Client.new
-      issues_raw_data = []
-
-      issues_urls.each do |issue_url|
-        url = UrlBuilder.build(issue_url)
-        client.register_request url do |issue_json|
-          issues_set.warn_issue_processed! # Issue processed, update percentage
-          issues_raw_data.push(
-            id: issue_json["id"], # used in JSON file to better identification
-            url: issue_json["url"],
-            html_url: issue_json["html_url"],
-            title: issue_json["title"],
-            user: issue_json["user"]["login"],
-            labels: issue_json["labels"],
-            body: issue_json["body"],
-            comments: issue_json["comments"], # in case user requested comments
-            comments_url: issue_json["comments_url"],
-            created_at: issue_json["created_at"], # Matching in newest
-            updated_at: issue_json["updated_at"] # Matching in recently updated
-          )
-        end
-      end
-      client.run_requests
-      
-      ordered_data = order_structure(issues_raw_data, match, issues_urls)
-      
-      issues_processed_data = []
-
+    def get_info_from_issues(issues_data, comments, match, issues_set)  
       # For comments retrieving
       client = Client.new
-      ordered_data.compact.each.with_index do |issue_data, data_index|
+
+      issues_processed_data = []
+      order_structure(issues_data, match) 
+      
+      issues_data.compact.each.with_index do |issue_data, data_index|
         
         filename = file_name_from(data_index, issue_data)
         labels = []
@@ -66,6 +42,7 @@ module GithubConsumer
             issues_processed_data[data_index][:comments] = issue_data[:comments]
             issues_processed_data[data_index][:comments_content] = comments_content
           end
+          issues_set.warn_issue_processed!
         end   
       end
       client.run_requests
@@ -76,28 +53,18 @@ module GithubConsumer
   private
 
     # Returns a ordered version of the received structure
-    def order_structure(issues_raw_data, match, issues_urls)
+    def order_structure(issues_data, match)
 
-      ordered_data = []
-      case match # first three cases in decreasing order
+      case match # Treating in decreasing order
       when "comments"
-        ordered_data = issues_raw_data.sort! { |a, b| b[:comments] <=> a[:comments] }
+        issues_data.sort! { |issueA, issueB| issueB[:comments] <=> issueA[:comments] }
       when "created"
-        ordered_data = issues_raw_data.sort! { |a, b| b[:created_at] <=> a[:created_at] }
+        issues_data.sort! { |issueA, issueB| issueB[:created_at] <=> issueA[:created_at] }
       when "updated"
-        ordered_data = issues_raw_data.sort! { |a, b| b[:updated_at] <=> a[:updated_at] }
+        issues_data.sort! { |issueA, issueB| issueB[:updated_at] <=> issueA[:updated_at] }
       else # best match
-        issues_urls.each do |url| # issues_urls is ordered by default in best match, using it as order parameter
-          issues_raw_data.each do |issueData|
-            if url == issueData[:url] then # Storing data in right position
-              ordered_data.push(issueData)
-              break
-            end
-          end
-        end
+        issues_data.sort! { |issueA, issueB| issueB[:score] <=> issueA[:score] }
       end
-
-      ordered_data
     end
 
     # Makes corresponding file name of given issue
