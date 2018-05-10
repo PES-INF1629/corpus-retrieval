@@ -2,6 +2,9 @@
 
 This version works similar to [Corpus Builder](https://github.com/nitanilla/corpus-retrieval), but it gives a collection of contents from issues for the same objective: boosting the discovering of information, reuse and to explore data with text-mining techniques.
 
+## Documents
+This [repository](https://github.com/PES-INF1629/INF1629TerceiroTrabalho) tracked the history while developing the tool. 
+
 ## Getting Started
 The working version can be located in:  
 *Link to be defined...*
